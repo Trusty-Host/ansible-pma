@@ -1,0 +1,55 @@
+---
+# configurate database
+
+- name: Check database user
+  community.mysql.mysql_info:
+    login_unix_socket: "{{ database_unix_socker }}"
+    filter:
+      - users
+  register: users_list
+
+- name: Configurate database
+  when: "'phpmyadmin' not in users_list.users.localhost"
+  block:
+    - name: Create database password
+      ansible.builtin.set_fact:
+        pma_database_pass: "{{ lookup('ansible.builtin.password', '/dev/null', length=15, chars=['ascii_letters', 'digits']) }}"
+
+    - name: Create user phpmyadmin
+      community.mysql.mysql_user:
+        name: phpmyadmin
+        password: "{{ pma_database_pass }}"
+        priv: "phpmyadmin.*:ALL"
+        state: present
+        login_unix_socket: "{{ database_unix_socker }}"
+
+    - name: Import database
+      community.mysql.mysql_db:
+        name: phpmyadmin
+        state: import
+        target: "{{ pma_path }}/sql/create_tables.sql"
+        login_unix_socket: "{{ database_unix_socker }}"
+
+    - name: Set pma controluser user
+      ansible.builtin.replace:
+        path: "{{ pma_path }}/config.inc.php"
+        regexp: ".+controluser.+"
+        replace: "$cfg['Servers'][$i]['controluser'] = \"phpmyadmin\";"
+
+    - name: Set pma database user
+      ansible.builtin.replace:
+        path: "{{ pma_path }}/config.inc.php"
+        regexp: ".+pmadb.+"
+        replace: "$cfg['Servers'][$i]['pmadb'] = \"phpmyadmin\";"
+
+    - name: Set pma database password
+      ansible.builtin.replace:
+        path: "{{ pma_path }}/config.inc.php"
+        regexp: ".+controlpass.+"
+        replace: "$cfg['Servers'][$i]['controlpass'] = \"{{ pma_database_pass }}\";"
+
+    - name: Remove all slashes from the config.inc.php
+      ansible.builtin.replace:
+        path: "{{ pma_path }}/config.inc.php"
+        regexp: '^(.*)\/\/(.*)Servers(.*)$'
+        replace: '\1\2Servers\3'

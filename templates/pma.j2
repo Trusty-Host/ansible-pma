@@ -1,0 +1,12 @@
+    location /pma/ {
+        index index.php;
+
+        location ~ \.php$ {
+            fastcgi_pass unix:/run/php/php{{ php_package_version }}-fpm.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $request_filename;
+            include fastcgi_params;
+            fastcgi_ignore_client_abort off;
+        }
+
+    }

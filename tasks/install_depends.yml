@@ -1,0 +1,14 @@
+---
+# install depends
+
+- name: Install depends PHP package
+  ansible.builtin.apt:
+    name: "php{{ php_package_version }}-{{ php_packages }}"
+    state: present
+    update_cache: true
+  loop:
+    - mbstring
+    - mysqli
+  loop_control:
+    loop_var: php_packages
+  notify: Restart PHP

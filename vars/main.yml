@@ -1,0 +1,5 @@
+---
+# vars file for pma
+
+nginx_path: "/etc/nginx"
+database_unix_socker: "/run/mysqld/mysqld.sock"

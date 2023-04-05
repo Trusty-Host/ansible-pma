@@ -1,0 +1,24 @@
+---
+# install pma
+
+- name: Create pma directory
+  ansible.builtin.file:
+    dest: "{{ pma_path }}"
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: Download and unarchive pma
+  ansible.builtin.unarchive:
+    src: "https://files.phpmyadmin.net/phpMyAdmin/{{ pma_version }}/phpMyAdmin-{{ pma_version }}-all-languages.tar.gz"
+    dest: "{{ pma_path }}"
+    remote_src: true
+    extra_opts: '--strip-components=1'
+    owner: www-data
+    group: www-data
+
+- name: Set version fact
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_path }}/facts.d/{{ role_name }}.fact"
+    regexp: "^{{ role_name }}_version:"
+    line: "{{ role_name }}_version: {{ pma_version }}"

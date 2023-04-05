@@ -1,0 +1,10 @@
+---
+# configurate webserver
+
+- name: Configurate webserver
+  ansible.builtin.blockinfile:
+    path: "{{ nginx_path }}/conf.d/sites.conf"
+    content: "{{ lookup('template', 'pma.j2') }}"
+    insertbefore: "}"
+    marker: "# {mark} PMA Configuration"
+  notify: Restart Nginx

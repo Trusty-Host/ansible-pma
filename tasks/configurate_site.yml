@@ -1,0 +1,29 @@
+---
+# configurate site
+
+- name: Check new default config exsists
+  ansible.builtin.stat:
+    path: "{{ pma_path }}/config.inc.php"
+  register: config_file
+
+- name: Settings config
+  when: not config_file.stat.exists
+  block:
+    - name: Create passwords
+      ansible.builtin.set_fact:
+        blowfish_secret: "{{ lookup('ansible.builtin.password', '/dev/null', length=32, chars=['ascii_letters', 'digits']) }}"
+
+    - name: Copy new default config
+      ansible.builtin.copy:
+        src: "{{ pma_path }}/config.sample.inc.php"
+        dest: "{{ pma_path }}/config.inc.php"
+        remote_src: true
+        owner: www-data
+        group: www-data
+        mode: "0644"
+
+    - name: Set "blowfish_secret"
+      ansible.builtin.replace:
+        path: "{{ pma_path }}/config.inc.php"
+        regexp: "(\\$cfg\\[\\'blowfish_secret\\'\\]\\s*=\\s*)''"
+        replace: '\g<1>"{{ blowfish_secret }}"'
