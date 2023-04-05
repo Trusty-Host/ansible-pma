@@ -1,0 +1,20 @@
+---
+- src: git@github.com:Trusty-Host/ansible-common.git
+  scm: git
+  version: main
+  name: common
+
+- src: git@github.com:Trusty-Host/ansible-nginx.git
+  scm: git
+  version: main
+  name: nginx
+
+- src: git@github.com:Trusty-Host/ansible-php.git
+  scm: git
+  version: main
+  name: php
+
+- src: git@github.com:Trusty-Host/ansible-mariadb.git
+  scm: git
+  version: main
+  name: mariadb

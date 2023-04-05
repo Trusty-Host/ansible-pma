@@ -1,0 +1,31 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: ubuntu-22.04
+    image: deff/docker-ubuntu2204-ansible:latest
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+provisioner:
+  name: ansible
+  playbooks:
+    converge: ${MOLECULE_PLAYBOOK:-converge.yml}
+scenario:
+  name: default
+  test_sequence:
+    - lint
+    - destroy
+    - dependency #
+    - syntax
+    - create
+    - prepare #
+    - converge
+    - idempotence
+    - side_effect #
+    - verify
+    - destroy
+verifier:
+  name: testinfra

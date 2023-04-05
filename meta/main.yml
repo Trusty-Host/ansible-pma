@@ -1,0 +1,15 @@
+dependencies: []
+
+galaxy_info:
+  author: Deff
+  role_name: pma
+  namespace: deff
+  description: Settings and install pma
+  company: Trusty
+  license: license (MIT)
+  min_ansible_version: 2.14.4
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - bionic

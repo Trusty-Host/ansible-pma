@@ -1,0 +1,24 @@
+---
+# tasks file for pma
+
+- name: Create fact file
+  ansible.builtin.copy:
+    dest: "{{ ansible_path }}/facts.d/{{ role_name }}.fact"
+    content: "[default]"
+    mode: "0644"
+    force: false
+
+- name: Install depends
+  ansible.builtin.include_tasks: install_depends.yml
+
+- name: Configurate webserver
+  ansible.builtin.include_tasks: configurate_webserver.yml
+
+- name: Install site
+  ansible.builtin.include_tasks: install_site.yml
+
+- name: Configurate site
+  ansible.builtin.include_tasks: configurate_site.yml
+
+- name: Configurate database
+  ansible.builtin.include_tasks: configurate_database.yml
